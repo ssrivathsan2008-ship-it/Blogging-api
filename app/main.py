@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from .database import engine
 from . import models
 from .routers import users, posts, comments
@@ -28,6 +29,9 @@ app.include_router(users.router)
 app.include_router(posts.router)
 app.include_router(comments.router)
 
+# Mount static files directory
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
 @app.get("/", include_in_schema=False)
 def root():
-    return RedirectResponse(url="/docs")
+    return FileResponse("app/static/index.html")

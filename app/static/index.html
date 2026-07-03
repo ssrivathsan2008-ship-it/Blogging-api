@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevVerse | Modern Blog Dashboard</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background Gradients for Cosmic/Glassmorphic Look -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area" onclick="navigateTo('feed')">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <h1>Dev<span>Verse</span></h1>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="#" class="nav-item active" id="nav-home" onclick="navigateTo('feed')"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="#" class="nav-item" id="nav-create" onclick="navigateTo('create')"><i class="fa-solid fa-pen-nib"></i> Write</a>
+                <a href="/docs" target="_blank" class="nav-item"><i class="fa-solid fa-book"></i> API Docs</a>
+            </nav>
+
+            <div class="auth-area" id="header-auth">
+                <!-- Dynamically filled by JS -->
+                <button class="btn btn-primary" onclick="openAuthModal('login')">Sign In</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-content">
+        
+        <!-- FEED VIEW -->
+        <section id="view-feed" class="content-view active">
+            <div class="hero-section">
+                <h2>Explore the Dev Universe</h2>
+                <p>Read articles, write columns, and discuss development paradigms with tech creators around the globe.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-glow" onclick="navigateTo('create')">Start Writing <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="feed-header">
+                <h3>Latest Columns</h3>
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="feed-search" placeholder="Search posts..." oninput="handleSearch(this.value)">
+                </div>
+            </div>
+
+            <div class="posts-grid" id="posts-container">
+                <!-- Dynamically loaded -->
+                <div class="loading-spinner">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Loading space posts...
+                </div>
+            </div>
+        </section>
+
+        <!-- POST DETAIL VIEW -->
+        <section id="view-post-detail" class="content-view">
+            <button class="btn btn-secondary back-btn" onclick="navigateTo('feed')">
+                <i class="fa-solid fa-arrow-left"></i> Back to Feed
+            </button>
+
+            <article class="post-detail-card" id="post-detail-content">
+                <!-- Dynamically loaded -->
+            </article>
+
+            <section class="comments-section">
+                <h3>Discussion Board</h3>
+                <div class="comment-input-container" id="new-comment-container">
+                    <!-- Loaded dynamically depending on auth status -->
+                </div>
+                <div class="comments-list" id="comments-container">
+                    <!-- Dynamically loaded -->
+                </div>
+            </section>
+        </section>
+
+        <!-- CREATE/EDIT POST VIEW -->
+        <section id="view-create" class="content-view">
+            <div class="form-container">
+                <h2 id="editor-title">Draft a New Column</h2>
+                <p class="form-subtitle">Share your insights, code experiments, or developer updates.</p>
+                
+                <form id="post-form" onsubmit="handlePostSubmit(event)">
+                    <input type="hidden" id="edit-post-id">
+                    <div class="form-group">
+                        <label for="post-title">Title</label>
+                        <input type="text" id="post-title" placeholder="Give your post a striking title..." required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="post-content">Body Content</label>
+                        <textarea id="post-content" rows="12" placeholder="Write your post details here (Markdown friendly)..." required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="navigateTo('feed')">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-post">Publish Column</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+                <button class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">Sign Up</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="login-form" class="auth-form active" onsubmit="handleLoginSubmit(event)">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="login-username" placeholder="testuser" required autocomplete="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                </div>
+                <div id="login-error" class="auth-error-msg"></div>
+                <button type="submit" class="btn btn-primary btn-block">Access Dashboard</button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="register-form" class="auth-form" onsubmit="handleRegisterSubmit(event)">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="reg-username" placeholder="alphanumeric only" required autocomplete="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="reg-email" placeholder="dev@example.com" required autocomplete="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reg-password" placeholder="Min. 8 characters" required autocomplete="new-password">
+                    </div>
+                </div>
+                <div id="register-error" class="auth-error-msg"></div>
+                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION SYSTEM -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Custom Script -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
